@@ -6,9 +6,10 @@ public class Assert {
     }
 
     static void that(boolean pred, String msg) {
-        if (!pred)
+        if (!pred) {
             System.err.println("Failed :" + msg);
-        else
-            System.out.println("P");
+        } else {
+            //System.out.println("P");
+        }
     }
 }

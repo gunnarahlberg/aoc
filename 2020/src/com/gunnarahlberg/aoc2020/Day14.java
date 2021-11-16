@@ -4,16 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Day14 {
 
@@ -25,7 +19,7 @@ public class Day14 {
         HashMap<Integer, boolean[]> data = new HashMap<>();
         String maskString = null;
         final String MASKPREFIX = "mask = ";
-        for(String line:input) {
+        for (String line : input) {
             if (line.startsWith(MASKPREFIX)) {
                 maskString = line.substring(MASKPREFIX.length());
             } else {
@@ -34,6 +28,7 @@ public class Day14 {
                 int memoryPosition = Integer.parseInt(matcher.group(1));
                 int decValue = Integer.parseInt(matcher.group(2));
                 String binary = toBinary(decValue);
+                boolean[] memory = data.computeIfAbsent(memoryPosition, unused -> new boolean[36]);
                 for (int i = 0; i < 36; i++) {
                     boolean newValue;
                     char maskAtPos = maskString.charAt(i);
@@ -42,7 +37,6 @@ public class Day14 {
                     } else {
                         newValue = binary.charAt(i) == '1';
                     }
-                    boolean[] memory = data.computeIfAbsent(memoryPosition, unused -> new boolean[36]);
                     memory[i] = newValue;
                 }
             }

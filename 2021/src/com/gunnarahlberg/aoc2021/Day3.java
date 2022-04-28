@@ -6,12 +6,13 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class Day3 {
     long solution1 = 0, solution2 = 0;
     String day = getClass().getSimpleName();
 
-    static record Input(boolean[] mask) {
+    static record Input(boolean[] bits) {
         static Input from(String s) {
             boolean[] b = new boolean[s.length()];
             char[] charArray = s.toCharArray();
@@ -23,9 +24,10 @@ public class Day3 {
         }
 
         public long toLong() {
-           return Day3.toLong(mask);
+            return Day3.toLong(bits);
         }
     }
+
     static long toLong(boolean[] bits) {
         long result = 0;
         for (boolean bit : bits) {
@@ -60,19 +62,19 @@ public class Day3 {
     }
 
     private static long sum1(List<Input> input) {
-        int length = input.get(0).mask.length;
+        int length = input.get(0).bits.length;
         int[] zeros = new int[length];
         int[] ones = new int[length];
         for (Input i : input) {
             for (int j = 0; j < length; j++) {
-                if (i.mask[j]) {
+                if (i.bits[j]) {
                     ones[j]++;
                 } else
                     zeros[j]++;
             }
         }
-        boolean[] bits1= new boolean[length];
-        boolean[] bits2= new boolean[length];
+        boolean[] bits1 = new boolean[length];
+        boolean[] bits2 = new boolean[length];
         for (int j = 0; j < length; j++) {
             if (zeros[j] > ones[j]) {
                 bits1[j] = false;
@@ -88,30 +90,33 @@ public class Day3 {
     }
 
     private static long sum2(List<Input> input) {
-        long o = reduce(input, true);
-        long c = reduce(input, false);
-        return o * c;
+        return LongStream.of(0, 1).map(value -> {
+            boolean oxygen = value != 1;
+            return getValue(input, oxygen);
+        }).reduce((left, right) -> left * right).getAsLong();
     }
 
-    private static long reduce(List<Input> input, boolean oxygen) {
+    private static long getValue(List<Input> input, boolean ox) {
         int pos = 0;
         List<Input> collect = input;
         while (collect.size() > 1) {
             int zeros = 0, ones = 0;
             for (Input i : collect) {
-                if (i.mask[pos]) {
+                if (i.bits[pos]) {
                     ones++;
                 } else
                     zeros++;
             }
-            boolean n;
-            if (oxygen) {
-                n = ones >= zeros;
-            } else {
-                n = ones < zeros;
-            }
+
             final int p = pos;
-            collect = collect.stream().filter(input1 -> input1.mask[p] == n).collect(Collectors.toList());
+
+            boolean compareWith;
+            if (ox) {
+                compareWith = ones >= zeros;
+            } else {
+                compareWith = ones < zeros;
+            }
+            collect = collect.stream().filter(input1 -> input1.bits[p] == compareWith).collect(Collectors.toList());
             pos++;
 
         }
